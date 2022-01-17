@@ -11,6 +11,7 @@ type Cart struct {
 }
 
 type Detail_cart struct {
+	gorm.Model
 	Cart_id    []Cart    `gorm:"foreignKey:ID"`
 	Product_id []Product `gorm:"foreignKey:ID"`
 	Qty        int
