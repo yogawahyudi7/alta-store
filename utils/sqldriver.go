@@ -18,7 +18,7 @@ func InitDB(config *configs.AppConfig) *gorm.DB {
 			config.Database.Username,
 			config.Database.Password,
 			config.Database.Address,
-			config.Database.Port,
+			config.Database.DB_Port,
 			config.Database.Name,
 		)
 
