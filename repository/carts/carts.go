@@ -19,3 +19,8 @@ func (cr *CartsRepository) Gets() ([]entities.Cart, error) {
 	cr.db.Find(&carts)
 	return carts, nil
 }
+
+func (cr *CartsRepository) Insert(newCart entities.Cart) (entities.Cart, error) {
+	cr.db.Save(&newCart)
+	return newCart, nil
+}

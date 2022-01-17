@@ -19,3 +19,7 @@ func (tr *TransactionsRepository) Gets() ([]entities.Transaction, error) {
 	tr.db.Find(&transactions)
 	return transactions, nil
 }
+func (tr *TransactionsRepository) Insert(newTransactions entities.Transaction) (entities.Transaction, error) {
+	tr.db.Save(&newTransactions)
+	return newTransactions, nil
+}
