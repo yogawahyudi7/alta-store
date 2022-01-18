@@ -8,16 +8,20 @@ import (
 
 type Cart struct {
 	gorm.Model
-	ID           uint
-	Product_id   int
-	Product_qty  int
-	Total_price  int
-	DateCheckout time.Time
+	ID             uint
+	Total_Product  int
+	Total_price    int
+	DateCheckout   time.Time
+	User           User
+	Detail_cart_ID []Detail_cart
 }
 
 type Detail_cart struct {
 	gorm.Model
-	ID        uint
-	ProductID int
-	Qty       int
+	ID         uint
+	CartID     uint
+	ProductID  int
+	Qty        int
+	Price      int
+	TotalPrice int
 }
