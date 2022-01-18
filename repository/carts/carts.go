@@ -24,3 +24,10 @@ func (cr *CartsRepository) Insert(newCart entities.Cart) (entities.Cart, error) 
 	cr.db.Save(&newCart)
 	return newCart, nil
 }
+
+func (cr *CartsRepository) InsertProduct(newProduct entities.Detail_cart) (entities.Detail_cart, error) {
+
+	cr.db.Save(&newProduct)
+
+	return newProduct, nil
+}
