@@ -29,12 +29,11 @@ func (tr *TransactionsRepository) Insert(newTransactions entities.Transaction) (
 }
 func (tr *TransactionsRepository) Update(updateTransactions entities.Transaction, trID int) (entities.Transaction, error) {
 	transaction := entities.Transaction{}
-	tr.db.Find(&updateTransactions, "id=?", trID)
-
+	tr.db.Where("id=?", trID).Find(&transaction)
 	transaction.Status = updateTransactions.Status
-	tr.db.Save(&transaction)
 
-	return updateTransactions, nil
+	tr.db.Save(&transaction)
+	return transaction, nil
 }
 func (tr *TransactionsRepository) Delete(trID, userID int) (entities.Transaction, error) {
 	transaction := entities.Transaction{}

@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"project-e-commerces/configs"
 	"project-e-commerces/entities"
+	"project-e-commerces/repository/carts"
 	"project-e-commerces/repository/payments"
 	"project-e-commerces/repository/users"
 	"project-e-commerces/utils"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -15,53 +17,70 @@ import (
 func TestTransactionRepo(t *testing.T) {
 	config := configs.GetConfig()
 	db := utils.InitDB(config)
-	db.Migrator().DropTable(&entities.User{})
 	db.Migrator().DropTable(&entities.Category{})
 	db.Migrator().DropTable(&entities.Product{})
 	db.Migrator().DropTable(&entities.Stock{})
+
+	db.Migrator().DropTable(&entities.Cart{})
+	db.Migrator().DropTable(&entities.Detail_cart{})
+	db.Migrator().DropTable(&entities.User{})
+
 	db.Migrator().DropTable(&entities.Payment{})
 	db.Migrator().DropTable(&entities.Transaction{})
 	db.Migrator().DropTable(&entities.Detail_transaction{})
-	db.Migrator().DropTable(&entities.Cart{})
-	db.Migrator().DropTable(&entities.Detail_cart{})
-	db.AutoMigrate(entities.User{})
+
 	db.AutoMigrate(entities.Category{})
 	db.AutoMigrate(entities.Product{})
 	db.AutoMigrate(entities.Stock{})
+
+	db.AutoMigrate(entities.Cart{})
+	db.AutoMigrate(entities.Detail_cart{})
+	db.AutoMigrate(entities.User{})
+
 	db.AutoMigrate(entities.Payment{})
 	db.AutoMigrate(entities.Transaction{})
 	db.AutoMigrate(entities.Detail_transaction{})
-	db.AutoMigrate(entities.Cart{})
-	db.AutoMigrate(entities.Detail_cart{})
+
+	var newCart entities.Cart
+	newCart.Total_price = 0
+	newCart.DateCheckout = time.Now()
+	newCart.Detail_cart_ID = []entities.Detail_cart{}
 
 	var newUser entities.User
 	newUser.Name = "TestName1"
 	newUser.Password = "11223344"
 	newUser.Email = "Test@email.com"
 	newUser.Role = "user"
+	newUser.Cart_id = 1
 
 	var newPayment entities.Payment
 	newPayment.Payment_type = "payment1"
 	newPayment.Link = "ovo"
 
+	var err error
+
+	cartRep := carts.NewCartsRepo(db)
+	_, err = cartRep.Insert(newCart)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	userRep := users.NewRepository(db)
-	_, err := userRep.Register(newUser)
+	_, err = userRep.Register(newUser)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	paymentRep := payments.NewPaymentsRepo(db)
-	res, err := paymentRep.Insert(newPayment)
+	_, err = paymentRep.Insert(newPayment)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(res)
 
 	transactionRepo := NewTransactionsRepo(db)
 
 	t.Run("insert transaction", func(t *testing.T) {
 		var mockTransaction entities.Transaction
-		mockTransaction.ID = 1
 		mockTransaction.Total = 1
 		mockTransaction.Total_price = 10000
 		mockTransaction.Total_qty = 1
@@ -70,7 +89,9 @@ func TestTransactionRepo(t *testing.T) {
 		mockTransaction.Status = "Pending"
 
 		res, err := transactionRepo.Insert(mockTransaction)
+		fmt.Println("si res", res)
 		assert.Nil(t, err)
+
 		assert.Equal(t, mockTransaction.Total, res.Total)
 		assert.Equal(t, 1, int(res.ID))
 	})
@@ -86,9 +107,6 @@ func TestTransactionRepo(t *testing.T) {
 	})
 	t.Run("update 1 from transaction", func(t *testing.T) {
 		var mockUpdateTransaction entities.Transaction
-		mockUpdateTransaction.Total = 1
-		mockUpdateTransaction.Total_price = 10000
-		mockUpdateTransaction.Total_qty = 1
 		mockUpdateTransaction.Status = "SETTLEMENT"
 		res, err := transactionRepo.Update(mockUpdateTransaction, 1)
 		assert.Nil(t, err)
