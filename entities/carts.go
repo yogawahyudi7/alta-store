@@ -1,18 +1,23 @@
 package entities
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Cart struct {
 	gorm.Model
-	ID          uint
-	Product_id  int
-	Product_qty int
-	Total_price int
+	ID           uint
+	Product_id   int
+	Product_qty  int
+	Total_price  int
+	DateCheckout time.Time
 }
 
 type Detail_cart struct {
 	gorm.Model
-	Cart_id    []Cart    `gorm:"foreignKey:ID"`
-	Product_id []Product `gorm:"foreignKey:ID"`
-	Qty        int
+	ID        uint
+	ProductID int
+	Qty       int
 }
