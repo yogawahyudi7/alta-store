@@ -12,8 +12,8 @@ type UserInterface interface {
 	Login(email, password string) (entities.User, error)
 	// CRUD
 	Get(userId int) (entities.User, error)
-	Update(customer entities.User, customerId int) (entities.User, error)
-	Delete(userId int) (entities.User, error)
+	Update(customer entities.User) (entities.User, error)
+	Delete(userId int) error
 }
 
 type UserStructRepository struct {
