@@ -14,10 +14,10 @@ func NewProductRepo(db *gorm.DB) *productRepository {
 	return &productRepository{db}
 }
 
-func (cr *productRepository) GetAllProduct() ([]entities.Product, error) {
+func (pr *productRepository) GetAllProduct() ([]entities.Product, error) {
 	products := []entities.Product{}
 
-	err := cr.db.Find(&products).Error
+	err := pr.db.Find(&products).Error
 
 	if err != nil {
 		return products, err
@@ -26,10 +26,10 @@ func (cr *productRepository) GetAllProduct() ([]entities.Product, error) {
 	return products, nil
 }
 
-func (cr *productRepository) GetProductByID(product_id int) (entities.Product, error) {
+func (pr *productRepository) GetProductByID(product_id int) (entities.Product, error) {
 	product := entities.Product{}
 
-	err := cr.db.Where("ID = ?", product_id).Find(&product).Error
+	err := pr.db.Where("id = ?", product_id).Find(&product).Error
 
 	if err != nil {
 		return product, err
@@ -38,8 +38,8 @@ func (cr *productRepository) GetProductByID(product_id int) (entities.Product, e
 	return product, nil
 }
 
-func (cr *productRepository) CreateProduct(product entities.Product) (entities.Product, error) {
-	err := cr.db.Save(&product).Error
+func (pr *productRepository) CreateProduct(product entities.Product) (entities.Product, error) {
+	err := pr.db.Save(&product).Error
 
 	if err != nil {
 		return product, err
@@ -48,10 +48,10 @@ func (cr *productRepository) CreateProduct(product entities.Product) (entities.P
 	return product, nil
 }
 
-func (cr *productRepository) UpdateProduct(product_id int, product entities.Product) (entities.Product, error) {
+func (pr *productRepository) UpdateProduct(product_id int, product entities.Product) (entities.Product, error) {
 	productData := entities.Product{}
 
-	err := cr.db.Where("id = ?", product_id).Find(&productData).Error
+	err := pr.db.Where("id = ?", product_id).Find(&productData).Error
 
 	if err != nil || productData.ID == 0 {
 		return productData, err
@@ -61,7 +61,7 @@ func (cr *productRepository) UpdateProduct(product_id int, product entities.Prod
 	productData.Price = product.Price
 	productData.Category_id = product.Category_id
 
-	err = cr.db.Save(&productData).Error
+	err = pr.db.Save(&productData).Error
 
 	if err != nil || productData.ID == 0 {
 		return productData, err
@@ -70,11 +70,11 @@ func (cr *productRepository) UpdateProduct(product_id int, product entities.Prod
 	return productData, nil
 }
 
-func (cr *productRepository) UpdateStockProduct(product_id, qty int) (entities.Product, error) {
+func (pr *productRepository) UpdateStockProduct(product_id, qty int) (entities.Product, error) {
 	productData := entities.Product{}
 	stockData := entities.Stock{}
 
-	err := cr.db.Where("id = ?", product_id).Find(&productData).Error
+	err := pr.db.Where("id = ?", product_id).Find(&productData).Error
 
 	if err != nil || productData.ID == 0 {
 		return productData, err
@@ -82,7 +82,7 @@ func (cr *productRepository) UpdateStockProduct(product_id, qty int) (entities.P
 
 	productData.Stock = productData.Stock + qty
 
-	err = cr.db.Save(&productData).Error
+	err = pr.db.Save(&productData).Error
 
 	if err != nil || productData.ID == 0 {
 		return productData, err
@@ -91,7 +91,7 @@ func (cr *productRepository) UpdateStockProduct(product_id, qty int) (entities.P
 	stockData.Product_id = product_id
 	stockData.Qty = qty
 
-	err = cr.db.Create(&stockData).Error
+	err = pr.db.Create(&stockData).Error
 
 	if err != nil {
 		return productData, err
@@ -100,14 +100,26 @@ func (cr *productRepository) UpdateStockProduct(product_id, qty int) (entities.P
 	return productData, nil
 }
 
-func (cr *productRepository) DeleteProduct(product_id int) (entities.Product, error) {
+func (pr *productRepository) DeleteProduct(product_id int) (entities.Product, error) {
 	product := entities.Product{}
 
-	err := cr.db.Where("id = ?", product_id).Delete(&product).Error
+	err := pr.db.Where("id = ?", product_id).Delete(&product).Error
 
-	if err != nil || product.ID == 0 {
+	if err != nil {
 		return product, err
 	}
 
 	return product, nil
+}
+
+func (pr *productRepository) GetHistoryStockProduct(product_id int) ([]entities.Stock, error) {
+	stock := []entities.Stock{}
+
+	err := pr.db.Where("product_id = ?", product_id).Find(&stock).Error
+
+	if err != nil {
+		return stock, err
+	}
+
+	return stock, nil
 }

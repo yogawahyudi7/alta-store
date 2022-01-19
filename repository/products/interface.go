@@ -9,4 +9,5 @@ type ProductInterface interface {
 	UpdateProduct(product_id int, product entities.Product) (entities.Product, error)
 	UpdateStockProduct(product_id, qty int) (entities.Product, error)
 	DeleteProduct(product_id int) (entities.Product, error)
+	GetHistoryStockProduct(product_id int) ([]entities.Stock, error)
 }

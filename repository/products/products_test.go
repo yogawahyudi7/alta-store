@@ -242,3 +242,47 @@ func TestDeleteProduct(t *testing.T) {
 		assert.Equal(t, "", productData.Name)
 	})
 }
+
+func TestGetHistoryStockProduct(t *testing.T) {
+	config := configs.GetConfig()
+	db := utils.InitDB(config)
+
+	db.Migrator().DropTable(&entities.Product{})
+	db.Migrator().DropTable(&entities.Stock{})
+	db.Migrator().DropTable(&entities.Category{})
+	db.AutoMigrate(&entities.Category{})
+	db.AutoMigrate(&entities.Product{})
+	db.AutoMigrate(&entities.Stock{})
+
+	repo := NewProductRepo(db)
+	repoCategory := categorys.NewCategoryRepo(db)
+
+	t.Run("success-case", func(t *testing.T) {
+		mockCategory := entities.Category{Name: "Category 1"}
+		createCategoryData, _ := repoCategory.CreateCategory(mockCategory)
+
+		mockProduct := entities.Product{Name: "Product Alpha", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
+		createProductData, _ := repo.CreateProduct(mockProduct)
+
+		mockCreateStockProduct := entities.Stock{Product_id: 1, Qty: 1}
+
+		_, _ = repo.UpdateStockProduct(mockCreateStockProduct.Product_id, mockCreateStockProduct.Qty)
+
+		stockProductData, _ := repo.GetHistoryStockProduct(int(createProductData.ID))
+
+		assert.Equal(t, mockCreateStockProduct.Qty, stockProductData[0].Qty)
+	})
+
+	t.Run("error-case", func(t *testing.T) {
+		db.Migrator().DropTable(&entities.Product{})
+		db.Migrator().DropTable(&entities.Stock{})
+
+		mockCreateStockProduct := entities.Stock{Product_id: 1, Qty: 1}
+		_, _ = repo.UpdateStockProduct(mockCreateStockProduct.Product_id, mockCreateStockProduct.Qty)
+
+		stockProductData, _ := repo.GetHistoryStockProduct(int(1000))
+
+		assert.Equal(t, 0, stockProductData[0].Qty)
+
+	})
+}
