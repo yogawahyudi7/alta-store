@@ -69,5 +69,25 @@ func TestCartRepo(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, res, res)
 	})
+	t.Run("insert some product into detail_cart", func(t *testing.T) {
+		var mockDetailCart entities.Detail_cart
+		mockDetailCart.ProductID = 1
+		mockDetailCart.Qty = 1
+
+		res, err := cartRepo.InsertProduct(1, mockDetailCart)
+		assert.Nil(t, err)
+		assert.Equal(t, res, res)
+	})
+
+	t.Run("update qty some product into detail_cart", func(t *testing.T) {
+		res, err := cartRepo.UpdateProduct(1, 1, 1)
+		assert.Nil(t, err)
+		assert.Equal(t, res, res)
+	})
+	t.Run("delete some product into detail_cart", func(t *testing.T) {
+		res, err := cartRepo.DeleteProduct(1, 1)
+		assert.Nil(t, err)
+		assert.Equal(t, res, res)
+	})
 
 }
