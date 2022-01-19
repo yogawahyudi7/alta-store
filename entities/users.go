@@ -9,4 +9,5 @@ type User struct {
 	Email    string `gorm:"unique"`
 	Password string
 	Role     string
+	Cart_id  uint
 }

@@ -45,6 +45,7 @@ require (
 )
 
 require (
+	github.com/go-playground/assert/v2 v2.0.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect

@@ -26,29 +26,35 @@ func (uc UserController) Register(c echo.Context) error {
 	c.Bind(&user)
 	hash, _ := Hashpwd(user.Password)
 	user.Password = hash
+
 	res, err := uc.Repo.Register(user)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, common.ErrorResponse(http.StatusBadRequest, "email already exist"))
+		return c.JSON(http.StatusBadRequest, common.ErrorResponse(http.StatusBadRequest, err.Error()))
 	}
+
 	return c.JSON(http.StatusOK, common.SuccessResponse(res))
 }
 
 func (uc UserController) Login(c echo.Context) error {
 	var login entities.User
 	c.Bind(&login)
+
 	user, err := uc.Repo.Login(login.Email, login.Password)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, common.ErrorResponse(http.StatusNotFound, "not registered"))
+		return echo.NewHTTPError(http.StatusNotFound, common.ErrorResponse(http.StatusNotFound, err.Error()))
 	}
 
 	hash, err := Checkpwd(user.Password, login.Password)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, common.ErrorResponse(http.StatusBadRequest, "wrong password"))
+		return c.JSON(http.StatusBadRequest, common.ErrorResponse(http.StatusBadRequest, err.Error()))
 	}
+
 	var token string
+
 	if hash {
 		token, _ = CreateToken(int(user.ID))
 	}
+
 	return c.JSON(http.StatusOK, common.SuccessResponse(token))
 }
 
