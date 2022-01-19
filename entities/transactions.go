@@ -7,7 +7,6 @@ import (
 type Transaction struct {
 	gorm.Model
 	ID                    uint
-	Total                 int
 	Total_price           int
 	Total_qty             int
 	User_id               uint
