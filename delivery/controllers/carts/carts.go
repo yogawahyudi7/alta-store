@@ -37,7 +37,7 @@ func (crrep CartsController) PutItemIntoDetail_CartCtrl() echo.HandlerFunc {
 		}
 		if res, err := crrep.Repo.InsertProduct(uint(cartID), newItem); err != nil || res.ID == 0 {
 			if res2, err2 := crrep.Repo.UpdateProduct(newItem.CartID, newItem.ProductID, newItemReq.Qty); err2 != nil || res2.ID == 0 {
-				return c.JSON(http.StatusBadRequest, common.NewBadRequestResponse())
+				return c.JSON(http.StatusInternalServerError, common.NewInternalServerErrorResponse())
 			}
 		}
 
