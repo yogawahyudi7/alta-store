@@ -19,8 +19,8 @@ func RegisterUserPath(e *echo.Echo, uc controllers.UserController) {
 	// auth.Use(middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
 
 	//REGISTER & LOGIN
-	e.POST("/register", uc.Register)
-	e.POST("/login", uc.Login)
+	e.POST("/users/register", uc.Register)
+	e.POST("/users/login", uc.Login)
 
 	//RUD USER
 	e.GET("/users/profile", uc.Get, middleware.JWT([]byte(constants.JWT_SECRET_KEY)))

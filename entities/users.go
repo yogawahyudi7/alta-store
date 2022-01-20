@@ -10,5 +10,5 @@ type User struct {
 	Password      string
 	Role          string `gorm:"default:member"`
 	TransactionID []Transaction
-	Cart_id       uint
+	CartID        uint
 }

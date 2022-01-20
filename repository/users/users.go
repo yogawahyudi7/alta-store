@@ -2,6 +2,7 @@ package users
 
 import (
 	"project-e-commerces/entities"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -27,8 +28,14 @@ func NewRepository(db *gorm.DB) *UserStructRepository {
 
 func (ur *UserStructRepository) Register(user entities.User) (entities.User, error) {
 	userData := []entities.User{}
+	cartData := entities.Cart{
+		Total_Product: 0,
+		Total_price:   0,
+		DateCheckout:  time.Now(),
+	}
+	ur.db.Save(&cartData)
 	ur.db.Find(&userData)
-	user.Cart_id = uint(len(userData) + 1)
+	user.CartID = cartData.ID
 	if err := ur.db.Save(&user).Error; err != nil {
 		return user, err
 	}
