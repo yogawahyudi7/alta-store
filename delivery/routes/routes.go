@@ -15,8 +15,8 @@ import (
 
 func RegisterUserPath(e *echo.Echo, uc controllers.UserController) {
 	// e.Pre(middleware.RemoveTrailingSlash())
-	auth := e.Group("")
-	auth.Use(middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
+	// auth := e.Group("")
+	// auth.Use(middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
 
 	//REGISTER & LOGIN
 	e.POST("/register", uc.Register)
