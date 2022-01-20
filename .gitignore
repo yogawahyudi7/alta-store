@@ -1,3 +1,4 @@
 configs/
 *.env
-**utils/*.go
+utils/
+go.mod

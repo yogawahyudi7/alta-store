@@ -2,6 +2,8 @@ package routes
 
 import (
 	"project-e-commerces/delivery/controllers/carts"
+	"project-e-commerces/delivery/controllers/categorys"
+	"project-e-commerces/delivery/controllers/products"
 	"project-e-commerces/delivery/controllers/transactions"
 
 	"project-e-commerces/constants"
@@ -27,6 +29,22 @@ func RegisterUserPath(e *echo.Echo, uc controllers.UserController) {
 
 }
 
-func RegisterPath(e *echo.Echo, crCtrl *carts.CartsController, tsCtrl *transactions.TransactionsController) {
+func RegisterPath(e *echo.Echo, crCtrl *carts.CartsController, tsCtrl *transactions.TransactionsController, cc *categorys.CategoryController, pc *products.ProductController) {
+	e.PUT("/carts/additem/:id", crCtrl.PutItemIntoDetail_CartCtrl())
+	e.DELETE("/carts/delitem/:id", crCtrl.DeleteItemFromDetail_CartCtrl())
 
+	e.POST("/transactions/live/:id", tsCtrl.PostProductTransactionCtrl())
+	e.GET("/categorys", cc.GetAllCategory)
+	e.GET("/categorys/:id", cc.GetCategoryByID)
+	e.POST("/categorys", cc.CreateCategory)
+	e.PUT("/categorys/:id", cc.UpdateCategory)
+	e.DELETE("/categorys/:id", cc.DeleteCategory)
+
+	e.GET("/products", pc.GetAllProduct)
+	e.GET("/products/:id", pc.GetProductByID)
+	e.GET("/products/stocks/:id", pc.GetHistoryStockProduct)
+	e.POST("/products", pc.CreateProduct)
+	e.POST("/products/stocks/:id", pc.UpdateStockProduct)
+	e.PUT("/products/:id", pc.UpdateProduct)
+	e.DELETE("/products/:id", pc.DeleteProduct)
 }

@@ -1,8 +1,0 @@
-port: 8080
-database:
-  driver: "mysql"
-  name: "ecommerces_db"
-  address: "localhost"
-  port: 3306
-  username: "root"
-  password: "root"
