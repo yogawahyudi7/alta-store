@@ -29,30 +29,30 @@ func (uc UserController) Register(c echo.Context) error {
 
 	res, err := uc.Repo.Register(user)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, common.ErrorResponse(http.StatusBadRequest, err.Error()))
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, common.SuccessResponse(res))
+	return c.JSON(http.StatusOK, res)
 }
 
 func (uc UserController) Login(c echo.Context) error {
 	var login entities.User
 	c.Bind(&login)
 
-	user, err := uc.Repo.Login(login.Email, login.Password)
+	user, err := uc.Repo.Login(login.Email)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, common.ErrorResponse(http.StatusNotFound, err.Error()))
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
 	hash, err := Checkpwd(user.Password, login.Password)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, common.ErrorResponse(http.StatusBadRequest, err.Error()))
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
 	var token string
 
 	if hash {
-		token, _ = CreateToken(int(user.ID))
+		token, _ = CreateToken(int(user.ID), user.Role)
 	}
 
 	return c.JSON(http.StatusOK, common.SuccessResponse(token))
@@ -63,18 +63,20 @@ func (uc UserController) Login(c echo.Context) error {
 //================
 func (uc UserController) Get(c echo.Context) error {
 	userId := ExtractTokenUserId(c)
+	// userId, _ := strconv.Atoi(c.Param("id"))
 	user, err := uc.Repo.Get(userId)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, common.ErrorResponse(http.StatusNotFound, "not found"))
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	return c.JSON(http.StatusOK, common.SuccessResponse(user))
 }
 
 func (uc UserController) Delete(c echo.Context) error {
 	userId := ExtractTokenUserId(c)
+	// userId, _ := strconv.Atoi(c.Param("id"))
 	err := uc.Repo.Delete(userId)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, common.ErrorResponse(http.StatusNotFound, err.Error()))
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	return c.JSON(http.StatusOK, common.SuccessResponse(err))
 }
@@ -83,17 +85,17 @@ func (uc UserController) Update(c echo.Context) error {
 	userId := ExtractTokenUserId(c)
 	user, err := uc.Repo.Get(userId)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, common.ErrorResponse(http.StatusNotFound, "not found"))
+		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 	var tmpUser entities.User
 	c.Bind((&tmpUser))
 	user.Name = tmpUser.Name
 	user.Email = tmpUser.Email
-	hash, _ := Hashpwd(user.Password)
+	hash, _ := Hashpwd(tmpUser.Password)
 	user.Password = hash
 	userRes, err := uc.Repo.Update(user)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorResponse(http.StatusBadRequest, err.Error()))
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	return c.JSON(http.StatusOK, common.SuccessResponse(userRes))
+	return c.JSON(http.StatusOK, userRes)
 }
