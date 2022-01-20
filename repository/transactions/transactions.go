@@ -2,8 +2,13 @@ package transactions
 
 import (
 	"project-e-commerces/entities"
+	"strconv"
+	"time"
 
 	"gorm.io/gorm"
+
+	midtrans "github.com/midtrans/midtrans-go"
+	snap "github.com/midtrans/midtrans-go/snap"
 )
 
 type TransactionsRepository struct {
@@ -40,4 +45,24 @@ func (tr *TransactionsRepository) Delete(trID, userID int) (entities.Transaction
 	tr.db.Find(&transaction, "id=? AND user_id=?", trID, userID)
 	tr.db.Delete(&transaction)
 	return transaction, nil
+}
+
+func (tr *TransactionsRepository) GetPaymentURL(transaction entities.Transaction, userID uint) (string, error) {
+	midtrans.ServerKey = "SB-Mid-server-WBQoXNegZ5veTRfQsX3WOGFq"
+	midtrans.ClientKey = "SB-Mid-client-lbfJ_9e_8nsyvWWS"
+	midtrans.Environment = midtrans.Sandbox
+	tanggal := time.Now()
+	y, m, d := tanggal.Date()
+	req := &snap.Request{
+		TransactionDetails: midtrans.TransactionDetails{
+			OrderID:  "INV-" + strconv.Itoa(y) + strconv.Itoa(int(m)) + strconv.Itoa(d) + "/" + strconv.Itoa(int(userID)),
+			GrossAmt: int64(transaction.Total_price),
+		},
+		CreditCard: &snap.CreditCardDetails{
+			Secure: true,
+		},
+	}
+
+	snapTokenResp, _ := snap.CreateTransaction(req)
+	return snapTokenResp.RedirectURL, nil
 }

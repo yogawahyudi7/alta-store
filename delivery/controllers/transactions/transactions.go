@@ -31,18 +31,33 @@ func (trrep TransactionsController) PostProductTransactionCtrl() echo.HandlerFun
 			return c.JSON(http.StatusBadRequest, common.NewBadRequestResponse())
 		}
 
-		newItem := entities.Transaction{
-			User_id:     uint(userID),
+		paymentMidtrans := entities.Transaction{
+			ID:          uint(userID),
 			Total_price: newPTransaction.Product_price,
-			Total_qty:   newPTransaction.Product_qty,
-			PaymentID:   1,
 		}
-		if res, err := trrep.Repo.Insert(newItem); err != nil || res.ID == 0 {
+
+		if res, err := trrep.Repo.GetPaymentURL(paymentMidtrans, uint(userID)); err != nil {
+
 			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-				"code":    500,
-				"message": "Internal Server Error",
-				"data":    res,
+				"message": res,
 			})
+		} else {
+			newItem := entities.Transaction{
+				User_id:     uint(userID),
+				Total_price: newPTransaction.Product_price,
+				Total_qty:   newPTransaction.Product_qty,
+				Status:      "PENDING",
+				Url:         res,
+			}
+
+			if res, err := trrep.Repo.Insert(newItem); err != nil || res.ID == 0 {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"code":    500,
+					"message": "Internal Server Error",
+					"data":    res,
+				})
+
+			}
 		}
 
 		return c.JSON(http.StatusOK, common.NewSuccessOperationResponse())

@@ -8,4 +8,5 @@ type TransactionInterface interface {
 	Insert(newTransactions entities.Transaction) (entities.Transaction, error)
 	Update(updateTransactions entities.Transaction, trID int) (entities.Transaction, error)
 	Delete(trID, userID int) (entities.Transaction, error)
+	GetPaymentURL(trs entities.Transaction, userID uint) (string, error)
 }
