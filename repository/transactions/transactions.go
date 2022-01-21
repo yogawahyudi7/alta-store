@@ -72,3 +72,23 @@ func (tr *TransactionsRepository) GetPaymentURL(transaction entities.Transaction
 	snapTokenResp, _ := snap.CreateTransaction(req)
 	return snapTokenResp.RedirectURL, nil
 }
+
+func (tr *TransactionsRepository) GetsPaymentUrl(userID uint, totalPrice, totalQty int) (string, error) {
+	midtrans.ServerKey = "SB-Mid-server-WBQoXNegZ5veTRfQsX3WOGFq"
+	midtrans.ClientKey = "SB-Mid-client-lbfJ_9e_8nsyvWWS"
+	midtrans.Environment = midtrans.Sandbox
+	tanggal := time.Now()
+	y, m, d := tanggal.Date()
+	req := &snap.Request{
+		TransactionDetails: midtrans.TransactionDetails{
+			OrderID:  "INV-" + strconv.Itoa(y) + strconv.Itoa(int(m)) + strconv.Itoa(d) + "/c/" + strconv.Itoa(int(userID)),
+			GrossAmt: int64(totalPrice),
+		},
+		CreditCard: &snap.CreditCardDetails{
+			Secure: true,
+		},
+	}
+
+	snapTokenResp, _ := snap.CreateTransaction(req)
+	return snapTokenResp.RedirectURL, nil
+}

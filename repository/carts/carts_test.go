@@ -13,21 +13,12 @@ import (
 func TestInit(t *testing.T) {
 	config := configs.GetConfig()
 	db := utils.InitDB(config)
-	db.Migrator().DropTable(&entities.Category{})
-	db.Migrator().DropTable(&entities.Product{})
-	db.Migrator().DropTable(&entities.Stock{})
 
 	db.Migrator().DropTable(&entities.Cart{})
 	db.Migrator().DropTable(&entities.Detail_cart{})
-	db.Migrator().DropTable(&entities.User{})
-
-	db.AutoMigrate(entities.Category{})
-	db.AutoMigrate(entities.Product{})
-	db.AutoMigrate(entities.Stock{})
 
 	db.AutoMigrate(entities.Cart{})
 	db.AutoMigrate(entities.Detail_cart{})
-	db.AutoMigrate(entities.User{})
 
 	cartRepo := NewCartsRepo(db)
 
