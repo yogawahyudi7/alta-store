@@ -30,10 +30,13 @@ func RegisterUserPath(e *echo.Echo, uc controllers.UserController) {
 }
 
 func RegisterPath(e *echo.Echo, crCtrl *carts.CartsController, tsCtrl *transactions.TransactionsController, cc *categorys.CategoryController, pc *products.ProductController) {
+
 	e.PUT("/carts/additem/:id", crCtrl.PutItemIntoDetail_CartCtrl())
 	e.DELETE("/carts/delitem/:id", crCtrl.DeleteItemFromDetail_CartCtrl())
 
-	e.POST("/transactions/live/:id", tsCtrl.PostProductTransactionCtrl())
+	e.POST("/transactions/live/:id", tsCtrl.PostProductIntoTransactionCtrl())
+	e.POST("/transactions/cart/:id", tsCtrl.PostCartIntoTransactionCtrl())
+
 	e.GET("/categorys", cc.GetAllCategory)
 	e.GET("/categorys/:id", cc.GetCategoryByID)
 	e.POST("/categorys", cc.CreateCategory)

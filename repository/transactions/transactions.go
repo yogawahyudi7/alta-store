@@ -28,10 +28,15 @@ func (tr *TransactionsRepository) Get(trID int) (entities.Transaction, error) {
 	tr.db.Find(&transactions)
 	return transactions, nil
 }
-func (tr *TransactionsRepository) Insert(newTransactions entities.Transaction) (entities.Transaction, error) {
+func (tr *TransactionsRepository) InsertT(newTransactions entities.Transaction) (entities.Transaction, error) {
 	tr.db.Save(&newTransactions)
 	return newTransactions, nil
 }
+func (tr *TransactionsRepository) InsertDT(newDetailTransactions entities.Detail_transaction) (entities.Detail_transaction, error) {
+	tr.db.Save(&newDetailTransactions)
+	return newDetailTransactions, nil
+}
+
 func (tr *TransactionsRepository) Update(updateTransactions entities.Transaction, trID int) (entities.Transaction, error) {
 	transaction := entities.Transaction{}
 	tr.db.Where("id=?", trID).Find(&transaction)
@@ -40,6 +45,7 @@ func (tr *TransactionsRepository) Update(updateTransactions entities.Transaction
 	tr.db.Save(&transaction)
 	return transaction, nil
 }
+
 func (tr *TransactionsRepository) Delete(trID, userID int) (entities.Transaction, error) {
 	transaction := entities.Transaction{}
 	tr.db.Find(&transaction, "id=? AND user_id=?", trID, userID)
