@@ -2,7 +2,6 @@ package users
 
 import (
 	"project-e-commerces/entities"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -31,7 +30,6 @@ func (ur *UserStructRepository) Register(user entities.User) (entities.User, err
 	cartData := entities.Cart{
 		Total_Product: 0,
 		Total_price:   0,
-		DateCheckout:  time.Now(),
 	}
 	ur.db.Save(&cartData)
 	ur.db.Find(&userData)

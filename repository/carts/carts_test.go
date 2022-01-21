@@ -5,36 +5,9 @@ import (
 	"project-e-commerces/entities"
 	"project-e-commerces/utils"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func TestInit(t *testing.T) {
-	config := configs.GetConfig()
-	db := utils.InitDB(config)
-
-	db.Migrator().DropTable(&entities.Cart{})
-	db.Migrator().DropTable(&entities.Detail_cart{})
-
-	db.AutoMigrate(entities.Cart{})
-	db.AutoMigrate(entities.Detail_cart{})
-
-	cartRepo := NewCartsRepo(db)
-
-	t.Run("Insert Cart", func(t *testing.T) {
-
-		var newCart entities.Cart
-		newCart.DateCheckout = time.Now()
-		newCart.Total_Product = 0
-		newCart.Total_price = 0
-
-		res, err := cartRepo.Insert(newCart)
-		assert.Nil(t, err)
-		assert.Equal(t, 1, int(res.ID))
-	})
-
-}
 
 func TestCartRepo(t *testing.T) {
 	config := configs.GetConfig()
