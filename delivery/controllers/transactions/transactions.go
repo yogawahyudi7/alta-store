@@ -99,7 +99,16 @@ func (trrep TransactionsController) PostCartIntoTransactionCtrl() echo.HandlerFu
 			return c.JSON(http.StatusBadRequest, common.NewBadRequestResponse())
 		}
 		fmt.Println("cartID", cartID)
-		fmt.Println("cart", newCTransaction)
+		fmt.Println("productlist", newCTransaction)
+		Totalprice := 0
+		TotalQty := 0
+		for i := 0; i < len(newCTransaction.Products); i++ {
+			Totalprice += newCTransaction.Products[i].Product_price
+			TotalQty += newCTransaction.Products[i].Product_qty
+		}
+
+		fmt.Println("totalprice", Totalprice)
+		fmt.Println("totalqty", TotalQty)
 
 		// paymentMidtrans := entities.Transaction{
 		// 	ID:          uint(userID),

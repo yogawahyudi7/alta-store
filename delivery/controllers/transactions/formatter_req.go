@@ -11,7 +11,7 @@ type CartDetail_TransactionReqeuestFormat struct {
 }
 
 type ProductList struct {
-	ProductID     interface{} `json:"product_id"`
-	Product_qty   interface{} `json:"product_qty"`
-	Product_price interface{} `json:"product_price"`
+	ProductID     int `json:"product_id"`
+	Product_qty   int `json:"product_qty"`
+	Product_price int `json:"product_price"`
 }
