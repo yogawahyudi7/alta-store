@@ -2,6 +2,7 @@ package categorys
 
 import (
 	"net/http"
+	"project-e-commerces/delivery/common"
 	"project-e-commerces/entities"
 	"project-e-commerces/repository/categorys"
 	"strconv"
@@ -18,100 +19,58 @@ func NewCategoryControllers(cc categorys.CategoryInterface) *CategoryController 
 }
 
 func (c *CategoryController) GetAllCategory(e echo.Context) error {
-	res := GetCategoryResponseFormat{}
+	res, err := c.Repo.GetAllCategory()
 
-	categorys, err := c.Repo.GetAllCategory()
-
-	if err != nil || len(categorys) == 0 {
-		res.Message = "no categorys data found"
-		res.Data = categorys
-
-		return e.JSON(http.StatusNotFound, res)
+	if err != nil || len(res) == 0 {
+		return e.JSON(http.StatusInternalServerError, common.NewInternalServerErrorResponse())
 	}
 
-	res.Message = "success get all category"
-	res.Data = append(res.Data, categorys...)
-
-	return e.JSON(http.StatusOK, res)
+	return e.JSON(http.StatusOK, map[string]interface{}{
+		"code":    200,
+		"message": "successful operation",
+		"data":    res,
+	})
 }
 
 func (c *CategoryController) GetCategoryByID(e echo.Context) error {
-	res := GetCategoryResponseFormat{}
-
 	category_id, _ := strconv.Atoi(e.Param("id"))
 
-	// category_id, err := strconv.Atoi(e.Param("id"))
+	res, err := c.Repo.GetCategoryByID(category_id)
 
-	// if err != nil {
-	// 	res.Message = "can't get the id"
-	// 	res.Data = nil
-
-	// 	return e.JSON(http.StatusBadRequest, res)
-	// }
-
-	category, err := c.Repo.GetCategoryByID(category_id)
-
-	if err != nil || category.ID == 0 {
-		res.Message = "category not found"
-		res.Data = nil
-
-		return e.JSON(http.StatusNotFound, res)
+	if err != nil || res.ID == 0 {
+		return e.JSON(http.StatusNotFound, common.NewNotFoundResponse())
 	}
 
-	res.Message = "success get category"
-	res.Data = append(res.Data, category)
-
-	return e.JSON(http.StatusOK, res)
+	return e.JSON(http.StatusOK, map[string]interface{}{
+		"code":    200,
+		"message": "successful operation",
+		"data":    res,
+	})
 }
 
 func (c *CategoryController) CreateCategory(e echo.Context) error {
-	res := GetCategoryResponseFormat{}
-
 	input := CreateCategoryRequest{}
 
 	e.Bind(&input)
-
-	// err := e.Bind(&input)
-
-	// if err != nil {
-	// 	res.Message = fmt.Sprint("can't get the input", err.Error())
-	// 	res.Data = nil
-
-	// 	return e.JSON(http.StatusBadRequest, res)
-	// }
-
-	// err = e.Validate(&input)
-
-	// if err != nil {
-	// 	// res.Message = "there is data that has not been filled in"
-	// 	res.Message = fmt.Sprint("errornya disini ", err.Error())
-	// 	res.Data = nil
-
-	// 	return e.JSON(http.StatusBadRequest, res)
-	// }
 
 	category := entities.Category{}
 
 	category.Name = input.Name
 
-	newCategory, err := c.Repo.CreateCategory(category)
+	res, err := c.Repo.CreateCategory(category)
 
 	if err != nil {
-		res.Data = nil
-		res.Message = "can't create category"
-
-		return e.JSON(http.StatusBadRequest, res)
+		return e.JSON(http.StatusInternalServerError, common.NewInternalServerErrorResponse())
 	}
 
-	res.Message = "success create category"
-	res.Data = append(res.Data, newCategory)
-
-	return e.JSON(http.StatusOK, res)
+	return e.JSON(http.StatusOK, map[string]interface{}{
+		"code":    200,
+		"message": "Successful Operation",
+		"data":    res,
+	})
 }
 
 func (c *CategoryController) UpdateCategory(e echo.Context) error {
-	res := GetCategoryResponseFormat{}
-
 	input := CreateCategoryRequest{}
 
 	e.Bind(&input)
@@ -120,66 +79,25 @@ func (c *CategoryController) UpdateCategory(e echo.Context) error {
 
 	category_id, _ := strconv.Atoi(e.Param("id"))
 
-	// category_id, err := strconv.Atoi(e.Param("id"))
-
-	// if err != nil {
-	// 	res.Message = "can't get the id"
-	// 	res.Data = nil
-
-	// 	return e.JSON(http.StatusBadRequest, res)
-	// }
-
-	// err = e.Validate(&input)
-
-	// if err != nil {
-	// 	res.Message = "there is data that has not been filled in"
-	// 	res.Data = nil
-
-	// 	return e.JSON(http.StatusBadRequest, res)
-	// }
-
 	category.Name = input.Name
 
-	updatedCategory, err := c.Repo.UpdateCategory(category_id, category)
+	_, err := c.Repo.UpdateCategory(category_id, category)
 
 	if err != nil {
-		res.Message = "can't update category"
-		res.Data = nil
-
-		return e.JSON(http.StatusBadRequest, res)
+		return e.JSON(http.StatusInternalServerError, common.NewInternalServerErrorResponse())
 	}
 
-	res.Message = "success update category"
-	res.Data = append(res.Data, updatedCategory)
-
-	return e.JSON(http.StatusOK, res)
+	return e.JSON(http.StatusOK, common.NewSuccessOperationResponse())
 }
 
 func (c *CategoryController) DeleteCategory(e echo.Context) error {
-	res := GetCategoryResponseFormat{}
-
 	category_id, _ := strconv.Atoi(e.Param("id"))
-
-	// category_id, err := strconv.Atoi(e.Param("id"))
-
-	// if err != nil {
-	// 	res.Message = "can't get the id"
-	// 	res.Data = nil
-
-	// 	return e.JSON(http.StatusBadRequest, res)
-	// }
 
 	_, err := c.Repo.DeleteCategory(category_id)
 
 	if err != nil {
-		res.Message = "can't delete category"
-		res.Data = nil
-
-		return e.JSON(http.StatusBadRequest, res)
+		return e.JSON(http.StatusInternalServerError, common.NewInternalServerErrorResponse())
 	}
 
-	res.Message = "success delete category"
-	res.Data = nil
-
-	return e.JSON(http.StatusOK, res)
+	return e.JSON(http.StatusOK, common.NewSuccessOperationResponse())
 }

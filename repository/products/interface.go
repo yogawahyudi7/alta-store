@@ -1,6 +1,9 @@
 package products
 
-import "project-e-commerces/entities"
+import (
+	"project-e-commerces/delivery/pagination"
+	"project-e-commerces/entities"
+)
 
 type ProductInterface interface {
 	GetAllProduct() ([]entities.Product, error)
@@ -10,4 +13,5 @@ type ProductInterface interface {
 	UpdateStockProduct(product_id, qty int) (entities.Product, error)
 	DeleteProduct(product_id int) (entities.Product, error)
 	GetHistoryStockProduct(product_id int) ([]entities.Stock, error)
+	ProductPagination(Pagination pagination.ProductPagination) (interface{}, int, error)
 }

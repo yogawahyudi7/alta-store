@@ -51,17 +51,9 @@ func (cr *categoryRepository) CreateCategory(category entities.Category) (entiti
 func (cr *categoryRepository) UpdateCategory(category_id int, category entities.Category) (entities.Category, error) {
 	categoryData := entities.Category{}
 
-	err := cr.db.Where("id = ?", category_id).Find(&categoryData).Error
+	err := cr.db.Model(&categoryData).Where("id = ?", category_id).Update("name", category.Name).Error
 
-	if err != nil || categoryData.ID == 0 {
-		return categoryData, err
-	}
-
-	categoryData.Name = category.Name
-
-	err = cr.db.Save(&categoryData).Error
-
-	if err != nil || categoryData.ID == 0 {
+	if err != nil {
 		return categoryData, err
 	}
 

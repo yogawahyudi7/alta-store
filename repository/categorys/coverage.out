@@ -9,11 +9,9 @@ project-e-commerces/repository/categorys/categorys.go:34.16,36.3 1 1
 project-e-commerces/repository/categorys/categorys.go:41.101,44.16 2 1
 project-e-commerces/repository/categorys/categorys.go:48.2,48.22 1 1
 project-e-commerces/repository/categorys/categorys.go:44.16,46.3 1 1
-project-e-commerces/repository/categorys/categorys.go:51.118,56.40 3 1
-project-e-commerces/repository/categorys/categorys.go:60.2,64.40 3 1
-project-e-commerces/repository/categorys/categorys.go:68.2,68.26 1 1
-project-e-commerces/repository/categorys/categorys.go:56.40,58.3 1 1
-project-e-commerces/repository/categorys/categorys.go:64.40,66.3 1 0
-project-e-commerces/repository/categorys/categorys.go:71.90,76.16 3 1
-project-e-commerces/repository/categorys/categorys.go:80.2,80.22 1 1
-project-e-commerces/repository/categorys/categorys.go:76.16,78.3 1 1
+project-e-commerces/repository/categorys/categorys.go:51.118,74.16 3 1
+project-e-commerces/repository/categorys/categorys.go:78.2,78.26 1 1
+project-e-commerces/repository/categorys/categorys.go:74.16,76.3 1 1
+project-e-commerces/repository/categorys/categorys.go:81.90,86.16 3 1
+project-e-commerces/repository/categorys/categorys.go:90.2,90.22 1 1
+project-e-commerces/repository/categorys/categorys.go:86.16,88.3 1 1

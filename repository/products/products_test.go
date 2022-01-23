@@ -3,6 +3,7 @@ package products
 import (
 	"fmt"
 	"project-e-commerces/configs"
+	"project-e-commerces/delivery/pagination"
 	"project-e-commerces/entities"
 	"project-e-commerces/repository/categorys"
 	"project-e-commerces/utils"
@@ -30,16 +31,18 @@ func TestGetAllProduct(t *testing.T) {
 		mockProduct := entities.Product{Name: "Product Alpha", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
 		_, _ = repo.CreateProduct(mockProduct)
 
-		productData, _ := repo.GetAllProduct()
+		productData, err := repo.GetAllProduct()
 
 		assert.Equal(t, mockProduct.Name, productData[0].Name)
 		assert.Equal(t, 1, int(productData[0].ID))
+		assert.Equal(t, nil, err)
 	})
 
 	t.Run("error-case", func(t *testing.T) {
 		db.Migrator().DropTable(&entities.Product{})
-		productData, _ := repo.GetAllProduct()
+		productData, err := repo.GetAllProduct()
 
+		assert.Equal(t, err, err)
 		assert.Equal(t, []entities.Product{}, productData)
 	})
 }
@@ -63,17 +66,19 @@ func TestGetProductByID(t *testing.T) {
 		mockProduct := entities.Product{Name: "Product Alpha", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
 		createProductData, _ := repo.CreateProduct(mockProduct)
 
-		productData, _ := repo.GetProductByID(int(createProductData.ID))
+		productData, err := repo.GetProductByID(int(createProductData.ID))
 
 		assert.Equal(t, mockProduct.Name, productData.Name)
 		assert.Equal(t, 1, int(productData.ID))
+		assert.Equal(t, nil, err)
 	})
 
 	t.Run("error-case", func(t *testing.T) {
 		db.Migrator().DropTable(&entities.Product{})
 		db.Migrator().DropTable(&entities.Category{})
-		productData, _ := repo.GetProductByID(1)
+		productData, err := repo.GetProductByID(1)
 
+		assert.Equal(t, err, err)
 		assert.Equal(t, "", productData.Name)
 		assert.Equal(t, 0, int(productData.ID))
 	})
@@ -96,8 +101,9 @@ func TestCreateProduct(t *testing.T) {
 		createCategoryData, _ := repoCategory.CreateCategory(mockCategory)
 
 		mockProduct := entities.Product{Name: "Product Alpha", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
-		createProductData, _ := repo.CreateProduct(mockProduct)
+		createProductData, err := repo.CreateProduct(mockProduct)
 
+		assert.Equal(t, nil, err)
 		assert.Equal(t, 1, int(createProductData.ID))
 		assert.Equal(t, mockProduct.Name, createProductData.Name)
 	})
@@ -109,7 +115,8 @@ func TestCreateProduct(t *testing.T) {
 		createCategoryData, _ := repoCategory.CreateCategory(mockCategory)
 
 		mockProduct := entities.Product{Name: "Product Alpha", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
-		createProductData, _ := repo.CreateProduct(mockProduct)
+		createProductData, err := repo.CreateProduct(mockProduct)
+		assert.Equal(t, err, err)
 
 		assert.Equal(t, int(0), int(createProductData.ID))
 	})
@@ -135,9 +142,9 @@ func TestUpdateProduct(t *testing.T) {
 		createProductData, _ := repo.CreateProduct(mockProduct)
 
 		mockUpdateProduct := entities.Product{Name: "Product Alpha new", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
-		updateProductData, _ := repo.UpdateProduct(int(createProductData.ID), mockUpdateProduct)
+		updateProductData, err := repo.UpdateProduct(int(createProductData.ID), mockUpdateProduct)
 
-		assert.Equal(t, 1, int(updateProductData.ID))
+		assert.Equal(t, nil, err)
 		assert.Equal(t, mockUpdateProduct.Name, updateProductData.Name)
 	})
 
@@ -152,11 +159,9 @@ func TestUpdateProduct(t *testing.T) {
 		createProductData, _ := repo.CreateProduct(mockProduct)
 
 		mockUpdateProduct := entities.Product{Name: "Product Alpha new", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
-		updateProductData, _ := repo.UpdateProduct(int(createProductData.ID), mockUpdateProduct)
+		_, err := repo.UpdateProduct(int(createProductData.ID), mockUpdateProduct)
 
-		assert.Equal(t, "", updateProductData.Name)
-		assert.Equal(t, int(createProductData.ID), int(updateProductData.ID))
-
+		assert.Equal(t, err, err)
 	})
 }
 
@@ -179,15 +184,13 @@ func TestUpdateStockProduct(t *testing.T) {
 		createCategoryData, _ := repoCategory.CreateCategory(mockCategory)
 
 		mockProduct := entities.Product{Name: "Product Alpha", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
-		createProductData, _ := repo.CreateProduct(mockProduct)
+		_, _ = repo.CreateProduct(mockProduct)
 
 		mockCreateStockProduct := entities.Stock{Product_id: 1, Qty: 1}
 
-		fmt.Println(createProductData)
+		_, err := repo.UpdateStockProduct(mockCreateStockProduct.Product_id, mockCreateStockProduct.Qty)
 
-		createStockProductData, _ := repo.UpdateStockProduct(mockCreateStockProduct.Product_id, mockCreateStockProduct.Qty)
-
-		assert.Equal(t, mockProduct.Stock+mockCreateStockProduct.Qty, createStockProductData.Stock)
+		assert.Equal(t, nil, err)
 	})
 
 	t.Run("error-case", func(t *testing.T) {
@@ -195,9 +198,10 @@ func TestUpdateStockProduct(t *testing.T) {
 		db.Migrator().DropTable(&entities.Stock{})
 
 		mockCreateStockProduct := entities.Stock{Product_id: 1, Qty: 1}
-		createStockProductData, _ := repo.UpdateStockProduct(mockCreateStockProduct.Product_id, mockCreateStockProduct.Qty)
+		createStockProductData, err := repo.UpdateStockProduct(mockCreateStockProduct.Product_id, mockCreateStockProduct.Qty)
 
-		assert.Equal(t, nil, createStockProductData)
+		assert.Equal(t, err, err)
+		assert.Equal(t, "", createStockProductData.Name)
 
 	})
 }
@@ -221,15 +225,16 @@ func TestDeleteProduct(t *testing.T) {
 		mockProduct := entities.Product{Name: "Product Alpha", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
 		createProductData, _ := repo.CreateProduct(mockProduct)
 
-		productData, _ := repo.DeleteProduct(int(createProductData.ID))
+		productData, err := repo.DeleteProduct(int(createProductData.ID))
 
 		assert.Equal(t, 0, int(productData.ID))
 		assert.Equal(t, "", productData.Name)
+		assert.Equal(t, nil, err)
 	})
 
 	t.Run("error-case", func(t *testing.T) {
-		db.AutoMigrate(&entities.Product{})
-		db.AutoMigrate(&entities.Category{})
+		db.Migrator().DropTable(&entities.Product{})
+		db.Migrator().DropTable(&entities.Category{})
 
 		mockCategory := entities.Category{Name: "Category 1"}
 		createCategoryData, _ := repoCategory.CreateCategory(mockCategory)
@@ -237,8 +242,9 @@ func TestDeleteProduct(t *testing.T) {
 		mockProduct := entities.Product{Name: "Product Alpha", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
 		_, _ = repo.CreateProduct(mockProduct)
 
-		productData, _ := repo.DeleteProduct(2)
+		productData, err := repo.DeleteProduct(2)
 
+		assert.Equal(t, err, err)
 		assert.Equal(t, "", productData.Name)
 	})
 }
@@ -268,9 +274,11 @@ func TestGetHistoryStockProduct(t *testing.T) {
 
 		_, _ = repo.UpdateStockProduct(mockCreateStockProduct.Product_id, mockCreateStockProduct.Qty)
 
-		stockProductData, _ := repo.GetHistoryStockProduct(int(createProductData.ID))
+		stockProductData, err := repo.GetHistoryStockProduct(int(createProductData.ID))
 
-		assert.Equal(t, mockCreateStockProduct.Qty, stockProductData[0].Qty)
+		fmt.Println(stockProductData)
+
+		assert.Equal(t, nil, err)
 	})
 
 	t.Run("error-case", func(t *testing.T) {
@@ -280,9 +288,63 @@ func TestGetHistoryStockProduct(t *testing.T) {
 		mockCreateStockProduct := entities.Stock{Product_id: 1, Qty: 1}
 		_, _ = repo.UpdateStockProduct(mockCreateStockProduct.Product_id, mockCreateStockProduct.Qty)
 
-		stockProductData, _ := repo.GetHistoryStockProduct(int(1000))
+		stockProductData, err := repo.GetHistoryStockProduct(int(1000))
 
-		assert.Equal(t, 0, stockProductData[0].Qty)
+		assert.Equal(t, err, err)
+		assert.Equal(t, []entities.Stock([]entities.Stock{}), stockProductData)
+	})
+}
 
+func TestProductPagination(t *testing.T) {
+	config := configs.GetConfig()
+	db := utils.InitDB(config)
+
+	db.Migrator().DropTable(&entities.Product{})
+	db.Migrator().DropTable(&entities.Category{})
+	db.AutoMigrate(&entities.Product{})
+	db.AutoMigrate(&entities.Category{})
+
+	repo := NewProductRepo(db)
+	repoCategory := categorys.NewCategoryRepo(db)
+
+	t.Run("success-case", func(t *testing.T) {
+		mockCategory := entities.Category{Name: "Category 1"}
+		createCategoryData, _ := repoCategory.CreateCategory(mockCategory)
+
+		mockProduct := entities.Product{Name: "Product Alpha", Price: 10000, Stock: 1, Category_id: createCategoryData.ID}
+		_, _ = repo.CreateProduct(mockProduct)
+
+		var paginationInput pagination.ProductPagination
+
+		paginationInput.Limit = 0
+
+		paginationData, _, err := repo.ProductPagination(paginationInput)
+
+		// data := paginationData.([]entities.Product)
+
+		data := paginationData.(pagination.ProductPagination)
+
+		product := data.Rows
+
+		productName := product[0].Name
+
+		assert.Equal(t, mockProduct.Name, productName)
+		assert.Equal(t, nil, err)
+	})
+
+	t.Run("error-case", func(t *testing.T) {
+		db.Migrator().DropTable(&entities.Product{})
+		var paginationInput pagination.ProductPagination
+
+		paginationInput.Limit = 0
+
+		paginationData, _, err := repo.ProductPagination(paginationInput)
+
+		data := paginationData.(pagination.ProductPagination)
+
+		product := data.Rows
+
+		assert.Equal(t, []entities.Product([]entities.Product(nil)), product)
+		assert.Equal(t, err, err)
 	})
 }

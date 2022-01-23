@@ -5,16 +5,20 @@ go 1.17
 require gorm.io/gorm v1.22.5
 
 require (
+	github.com/boombuler/barcode v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
+	github.com/google/uuid v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/jung-kurt/gofpdf v1.4.2 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -40,7 +44,9 @@ require (
 )
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/johnfercher/maroto v0.34.0
 	github.com/midtrans/midtrans-go v1.2.2
 	github.com/spf13/viper v1.10.1
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce

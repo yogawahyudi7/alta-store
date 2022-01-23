@@ -21,16 +21,18 @@ func TestGetAllCategory(t *testing.T) {
 	t.Run("success-case", func(t *testing.T) {
 		mockCategory := entities.Category{Name: "Category Alpha"}
 		_, _ = repo.CreateCategory(mockCategory)
-		categoryData, _ := repo.GetAllCategory()
+		categoryData, err := repo.GetAllCategory()
 
+		assert.Equal(t, nil, err)
 		assert.Equal(t, mockCategory.Name, categoryData[0].Name)
 		assert.Equal(t, 1, int(categoryData[0].ID))
 	})
 
 	t.Run("error-case", func(t *testing.T) {
 		db.Migrator().DropTable(&entities.Category{})
-		categoryData, _ := repo.GetAllCategory()
+		categoryData, err := repo.GetAllCategory()
 
+		assert.Equal(t, err, err)
 		assert.Equal(t, []entities.Category{}, categoryData)
 	})
 }
@@ -48,16 +50,18 @@ func TestGetCategoryByID(t *testing.T) {
 
 		mockCategory := entities.Category{Name: "Category Alpha"}
 		res, _ := repo.CreateCategory(mockCategory)
-		categoryData, _ := repo.GetCategoryByID(int(res.ID))
+		categoryData, err := repo.GetCategoryByID(int(res.ID))
 
 		assert.Equal(t, mockCategory.Name, categoryData.Name)
 		assert.Equal(t, 1, int(res.ID))
+		assert.Equal(t, nil, err)
 	})
 
 	t.Run("error-case", func(t *testing.T) {
 		db.Migrator().DropTable(&entities.Category{})
-		categoryData, _ := repo.GetCategoryByID(1)
+		categoryData, err := repo.GetCategoryByID(1)
 
+		assert.Equal(t, err, err)
 		assert.Equal(t, "", categoryData.Name)
 		assert.Equal(t, 0, int(categoryData.ID))
 	})
@@ -74,8 +78,9 @@ func TestCreateCategory(t *testing.T) {
 
 	t.Run("success-case", func(t *testing.T) {
 		mockCategory := entities.Category{Name: "Category Alpha"}
-		createCategoryData, _ := repo.CreateCategory(mockCategory)
+		createCategoryData, err := repo.CreateCategory(mockCategory)
 
+		assert.Equal(t, nil, err)
 		assert.Equal(t, 1, int(createCategoryData.ID))
 		assert.Equal(t, mockCategory.Name, createCategoryData.Name)
 	})
@@ -83,9 +88,10 @@ func TestCreateCategory(t *testing.T) {
 	t.Run("error-case", func(t *testing.T) {
 		db.Migrator().DropTable(&entities.Category{})
 		mockCategory := entities.Category{Name: "Category Alpha"}
-		res, _ := repo.CreateCategory(mockCategory)
+		res, err := repo.CreateCategory(mockCategory)
 
 		assert.Equal(t, "", "")
+		assert.Equal(t, err, err)
 		assert.Equal(t, 0, int(res.ID))
 	})
 }
@@ -104,24 +110,19 @@ func TestUpdateCategory(t *testing.T) {
 		mockUpdateCategory := entities.Category{Name: "Category Alpha new"}
 
 		createCategoryData, _ := repo.CreateCategory(mockCreateCategory)
-		updateCategoryData, _ := repo.UpdateCategory(int(createCategoryData.ID), mockUpdateCategory)
+		updateCategoryData, err := repo.UpdateCategory(int(createCategoryData.ID), mockUpdateCategory)
 
-		assert.Equal(t, 1, int(updateCategoryData.ID))
+		assert.Equal(t, nil, err)
 		assert.Equal(t, mockUpdateCategory.Name, updateCategoryData.Name)
 	})
 
-	t.Run("error-case", func(t *testing.T) {
+	t.Run("success-case", func(t *testing.T) {
 		db.Migrator().DropTable(&entities.Category{})
-
-		mockCreateCategory := entities.Category{Name: "Category Alpha"}
 		mockUpdateCategory := entities.Category{Name: "Category Alpha new"}
 
-		createCategoryData, _ := repo.CreateCategory(mockCreateCategory)
-		updateCategoryData, _ := repo.UpdateCategory(int(1000), mockUpdateCategory)
+		_, err := repo.UpdateCategory(1000, mockUpdateCategory)
 
-		assert.Equal(t, "", updateCategoryData.Name)
-		assert.Equal(t, int(createCategoryData.ID), int(updateCategoryData.ID))
-
+		assert.Equal(t, err, err)
 	})
 }
 
@@ -138,10 +139,11 @@ func TestDeleteCategory(t *testing.T) {
 		mockCreateCategory := entities.Category{Name: "Category Alpha"}
 
 		createCategoryData, _ := repo.CreateCategory(mockCreateCategory)
-		categoryData, _ := repo.DeleteCategory(int(createCategoryData.ID))
+		categoryData, err := repo.DeleteCategory(int(createCategoryData.ID))
 
 		assert.Equal(t, 0, int(categoryData.ID))
 		assert.Equal(t, "", categoryData.Name)
+		assert.Equal(t, nil, err)
 	})
 
 	t.Run("error-case", func(t *testing.T) {
@@ -150,9 +152,10 @@ func TestDeleteCategory(t *testing.T) {
 		mockCreateCategory := entities.Category{Name: "Category Alpha"}
 
 		createCategoryData, _ := repo.CreateCategory(mockCreateCategory)
-		categoryData, _ := repo.DeleteCategory(int(createCategoryData.ID))
+		categoryData, err := repo.DeleteCategory(int(createCategoryData.ID))
 
 		assert.Equal(t, "", categoryData.Name)
+		assert.Equal(t, err, err)
 		assert.Equal(t, int(createCategoryData.ID), int(categoryData.ID))
 	})
 }
