@@ -27,14 +27,14 @@ func NewRepository(db *gorm.DB) *UserStructRepository {
 }
 
 func (ur *UserStructRepository) Register(user entities.User) (entities.User, error) {
-	userData := []entities.User{}
+	// userData := []entities.User{}
 	cartData := entities.Cart{
 		Total_Product: 0,
 		Total_price:   0,
 		DateCheckout:  time.Now(),
 	}
 	ur.db.Save(&cartData)
-	ur.db.Find(&userData)
+	// ur.db.Find(&userData)
 	user.CartID = cartData.ID
 	if err := ur.db.Save(&user).Error; err != nil {
 		return user, err
