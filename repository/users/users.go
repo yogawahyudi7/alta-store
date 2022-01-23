@@ -10,7 +10,6 @@ import (
 type UserInterface interface {
 	// Register and Login
 	Register(user entities.User) (entities.User, error)
-	// Login(email, password string) (entities.User, error)
 	Login(email string) (entities.User, error)
 	// CRUD
 	Get(userId int) (entities.User, error)
@@ -43,23 +42,6 @@ func (ur *UserStructRepository) Register(user entities.User) (entities.User, err
 }
 
 func (ur *UserStructRepository) Login(email string) (entities.User, error) {
-	// login := entities.User{
-	// 	Email:    email,
-	// 	Password: password,
-	// }
-	// if err := ur.db.First(&login).Error; err != nil {
-	// 	return login, nil
-	// }
-	// return login, nil
-
-	// var user entities.User
-	// // err := ur.db.First(&user, "email = ?", email).Error
-	// err := ur.db.Where("email = ?", email).Find(&user).Error
-	// if err != nil {
-	// 	return user, err
-	// }
-	// return user, nil
-
 	var user entities.User
 	err := ur.db.First(&user, "email = ?", email).Error
 	if err != nil {
