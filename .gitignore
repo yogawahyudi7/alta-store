@@ -2,5 +2,9 @@ configs/
 *.env
 utils/
 go.mod
+<<<<<<< HEAD
 Dockerfile
 docker-compose.yaml
+=======
+*.out
+>>>>>>> B2

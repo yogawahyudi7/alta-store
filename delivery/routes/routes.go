@@ -23,9 +23,9 @@ func RegisterUserPath(e *echo.Echo, uc controllers.UserController) {
 	e.POST("/users/login", uc.Login)
 
 	//RUD USER
-	e.GET("/users/profile", uc.Get, middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
-	e.DELETE("/users/delete", uc.Delete, middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
-	e.PUT("/users/update", uc.Update, middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
+	e.GET("/users/profile", uc.Get(), middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
+	e.DELETE("/users/delete", uc.Delete(), middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
+	e.PUT("/users/update", uc.Update(), middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
 
 }
 
