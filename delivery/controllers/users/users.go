@@ -44,12 +44,16 @@ func (uc UserController) Register(c echo.Context) error {
 func (uc UserController) Login(c echo.Context) error {
 	var login RegisterReqFormat
 	if err := c.Bind(&login); err != nil {
-		return c.JSON(http.StatusBadRequest, "kesalahan input")
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "kesalahan input",
+		})
 	}
 
 	user, err := uc.Repo.Login(login.Email)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "email tidak ditemukan")
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"message": "email tidak ditemukan",
+		})
 	}
 
 	hash, err := Checkpwd(user.Password, login.Password)

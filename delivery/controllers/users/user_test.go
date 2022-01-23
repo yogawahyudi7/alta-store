@@ -188,6 +188,57 @@ func TestUser(t *testing.T) {
 	})
 }
 
+var jwtToken2 string
+
+func TestUserFalse(t *testing.T) {
+	t.Run("LoginUserFalse", func(t *testing.T) {
+		e := echo.New()
+
+		bodyReq, _ := json.Marshal(map[string]int{
+			"email":    1,
+			"password": 1,
+		})
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(bodyReq))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		context := e.NewContext(req, res)
+		context.SetPath("/users/login")
+
+		userController := NewUserController(mockUserRepository{})
+		userController.Login(context)
+
+		response := LoginResponseFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		jwtToken2 = response.Token
+		assert.Equal(t, "kesalahan input", response.Message)
+
+	})
+	t.Run("LoginUserFalse2", func(t *testing.T) {
+		e := echo.New()
+
+		bodyReq, _ := json.Marshal(map[string]string{
+			"email":    "tidakAda",
+			"password": "tidakAda",
+		})
+
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(bodyReq))
+		res := httptest.NewRecorder()
+		req.Header.Set("Content-Type", "application/json")
+		context := e.NewContext(req, res)
+		context.SetPath("/users/login")
+
+		userController := NewUserController(falseMockUserRepository{})
+		userController.Login(context)
+
+		response := LoginResponseFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		jwtToken2 = response.Token
+		assert.Equal(t, "email tidak ditemukan", response.Message)
+
+	})
+}
+
 //MOCK
 type mockUserRepository struct{}
 
@@ -216,8 +267,8 @@ func (m falseMockUserRepository) Register(user entities.User) (entities.User, er
 	return entities.User{}, errors.New("salah input")
 }
 func (m falseMockUserRepository) Login(email string) (entities.User, error) {
-	hash, _ := Hashpwd("mock1")
-	return entities.User{Email: "mock1", Password: hash}, nil
+	// hash, _ := Hashpwd("mock1")
+	return entities.User{}, errors.New("tidak temu iemail")
 }
 func (m falseMockUserRepository) Get(user int) (entities.User, error) {
 	return entities.User{Name: "mock1", Password: "mock1", Email: "mock1"}, nil
