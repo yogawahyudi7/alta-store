@@ -3,13 +3,17 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"project-e-commerces/constants"
 	"project-e-commerces/entities"
 	"testing"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,132 +22,209 @@ type GetUserResponseFormat struct {
 	Message string          `json:"message"`
 }
 
+type UpdateUserResponseFormat struct {
+	Message string          `json:"message"`
+	Data    []entities.User `json:"data"`
+}
 type GetUserResponse struct {
 	Data    entities.User `json:"data"`
 	Message string        `json:"message"`
 	Token   string        `json:"token"`
+}
+
+type GetLogin struct {
+	Message string `json:"message"`
+	Token   string `json:"token"`
 }
 type GetUserResponseLogin struct {
 	Message string `json:"message"`
 	Token   string `json:"token"`
 }
 
-type ResponseSuccess struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+func TestRegister(t *testing.T) {
+	t.Run("registerUser", func(t *testing.T) {
+		e := echo.New()
+		reqBody, _ := json.Marshal(
+			map[string]string{
+				"name":     "mock1",
+				"email":    "mock1",
+				"password": "mock1",
+			},
+		)
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+
+		context := e.NewContext(req, res)
+		context.SetPath("/users/register")
+
+		userController := NewUserController(mockUserRepository{})
+		userController.Register(context)
+
+		var response LoginResponseFormat
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		assert.Equal(t, "success register", response.Message)
+	})
+
+	t.Run("falseregisterUser", func(t *testing.T) {
+		e := echo.New()
+		reqBody, _ := json.Marshal(
+			map[string]string{
+				"name":     "mock1",
+				"email":    "mock1",
+				"password": "mock1",
+			},
+		)
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
+		res := httptest.NewRecorder()
+
+		context := e.NewContext(req, res)
+		context.SetPath("/users/register")
+
+		userController := NewUserController(falseMockUserRepository{})
+		userController.Register(context)
+
+		var response string
+
+		json.Unmarshal([]byte(res.Body.Bytes()), &response)
+		assert.Equal(t, "masukan input", response)
+	})
 }
 
 var jwtToken string
 
-func TestRegister(t *testing.T) {
-	t.Run("register", func(t *testing.T) {
+func TestUser(t *testing.T) {
+	t.Run("LoginUser", func(t *testing.T) {
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		reqBody, _ := json.Marshal(map[string]string{
+			"email":    "mock1",
+			"password": "mock1",
+		})
+		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(reqBody))
 		res := httptest.NewRecorder()
-
-		context := e.NewContext(req, res)
-		context.SetPath("/register")
-
-		userController := NewUserController(mockUserRepository{})
-		userController.Register(context)
-
-		var response entities.User
-
-		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-		assert.Equal(t, "mock1", response.Name)
-	})
-}
-func TestLogin(t *testing.T) {
-	t.Run("Login", func(t *testing.T) {
-		e := echo.New()
-
-		resBody, _ := json.Marshal(map[string]interface{}{"email": "yoga1", "password": "yoga1"})
-		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer(resBody))
-		res := httptest.NewRecorder()
-
+		// req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
 		req.Header.Set("Content-Type", "application/json")
 		context := e.NewContext(req, res)
-		context.SetPath("/login")
-		fmt.Println(req)
+		context.SetPath("/users/login")
 
 		userController := NewUserController(mockUserRepository{})
 		userController.Login(context)
+		// fmt.Println(res)
 
-		var response GetUserResponse
-
+		// fmt.Println(jwtToken)
+		response := LoginResponseFormat{}
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-		fmt.Println(response.Message)
-		// jwtToken = response.Data.(string)
-		assert.Equal(t, "ALO", response)
+		jwtToken = response.Token
+		// fmt.Println(response)
+		assert.Equal(t, "success login", response.Message)
 	})
-}
-
-func TestGet(t *testing.T) {
-	t.Run("Get", func(t *testing.T) {
+	t.Run("GetUser", func(t *testing.T) {
 		e := echo.New()
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		res := httptest.NewRecorder()
-
-		context := e.NewContext(req, res)
-		// context.Request().Header.Set(echo.HeaderAuthorization, "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiYXV0aG9yaXplZCI6dHJ1ZSwiZXhwIjoxNjQyODY1NDQ1LCJ1c2VySWQiOjN9.KpzNONOjnUA8-6dXJv6yPN43iyNTX4WLOBr6nxPx24A")
-		context.SetPath("/users/profile/:id")
-		context.SetParamNames("id")
-		context.SetParamValues("1")
-
-		userController := NewUserController(mockUserRepository{})
-		userController.Get(context)
-
-		var response entities.User
-
-		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-		fmt.Println(response)
-		assert.Equal(t, "mock1", response.Name)
-	})
-}
-
-func TestDelete(t *testing.T) {
-	t.Run("delete", func(t *testing.T) {
-		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/", nil)
-		res := httptest.NewRecorder()
-
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
 		context := e.NewContext(req, res)
 		context.SetPath("/users/profile")
 
 		userController := NewUserController(mockUserRepository{})
-		userController.Register(context)
+		middleware.JWT([]byte(constants.JWT_SECRET_KEY))(userController.Get())(context)
 
-		var response entities.User
+		// fmt.Println(res)
 
+		var response LoginResponseFormat
+		// jwtToken = response.Token
+		// fmt.Println(jwtToken)
 		json.Unmarshal([]byte(res.Body.Bytes()), &response)
-		assert.Equal(t, "mock1", response.Name)
+		// fmt.Println(response)
+		assert.Equal(t, "success get data", response.Message)
+	})
+
+	t.Run("UpdateUser", func(t *testing.T) {
+		e := echo.New()
+		reqBody, _ := json.Marshal(map[string]string{
+			"name":     "yogaUpdate",
+			"email":    "yogaUpdate",
+			"password": "yogaUpdate",
+		})
+		req := httptest.NewRequest(http.MethodPut, "/", bytes.NewBuffer(reqBody))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/users/update")
+
+		UserController := NewUserController(mockUserRepository{})
+
+		err := middleware.JWT([]byte(constants.JWT_SECRET_KEY))(UserController.Update())(context)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+
+		responses := UpdateUserResponseFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
+		assert.Equal(t, "success update", responses.Message)
+	})
+
+	t.Run("DeleteUser", func(t *testing.T) {
+		e := echo.New()
+		req := httptest.NewRequest(http.MethodDelete, "/", nil)
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", jwtToken))
+		res := httptest.NewRecorder()
+		context := e.NewContext(req, res)
+		context.SetPath("/users/delete")
+
+		UserController := NewUserController(mockUserRepository{})
+
+		err := middleware.JWT([]byte(constants.JWT_SECRET_KEY))(UserController.Delete())(context)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		responses := UpdateUserResponseFormat{}
+		json.Unmarshal([]byte(res.Body.Bytes()), &responses)
+		assert.Equal(t, "success delete", responses.Message)
 	})
 }
 
 //MOCK
 type mockUserRepository struct{}
 
-func (m mockUserRepository) Register(entities.User) (entities.User, error) {
-
+func (m mockUserRepository) Register(user entities.User) (entities.User, error) {
 	return entities.User{Name: "mock1", Password: "mock1", Email: "mock1"}, nil
-
 }
-
 func (m mockUserRepository) Login(email string) (entities.User, error) {
-	return entities.User{Email: "yoga1", Password: "yoga1"}, nil
+	hash, _ := Hashpwd("mock1")
+	return entities.User{Email: "mock1", Password: hash}, nil
 }
-
-// func (m mockUserRepository) FindUserByEmail(email string) (entities.User, error) {
-// 	return entities.User{Email: "yoga1", Password: "yoga1"}, nil
-// }
 func (m mockUserRepository) Get(user int) (entities.User, error) {
-	return entities.User{ID: 3, Name: "mock1", Password: "mock1", Email: "mock1", Role: "admin"}, nil
+
+	return entities.User{Name: "mock1", Password: "mock1", Email: "mock1", Role: "admin"}, nil
 }
 func (m mockUserRepository) Update(user entities.User) (entities.User, error) {
-	return entities.User{Name: user.Name, Email: user.Email, Password: user.Password}, nil
+	hash, _ := Hashpwd("mock1")
+	return entities.User{Email: "mock1", Password: hash}, nil
+}
+func (m mockUserRepository) Delete(userId int) error {
+	return nil
 }
 
-func (m mockUserRepository) Delete(userId int) error {
+type falseMockUserRepository struct{}
+
+func (m falseMockUserRepository) Register(user entities.User) (entities.User, error) {
+	return entities.User{}, errors.New("salah input")
+}
+func (m falseMockUserRepository) Login(email string) (entities.User, error) {
+	hash, _ := Hashpwd("mock1")
+	return entities.User{Email: "mock1", Password: hash}, nil
+}
+func (m falseMockUserRepository) Get(user int) (entities.User, error) {
+	return entities.User{Name: "mock1", Password: "mock1", Email: "mock1"}, nil
+}
+func (m falseMockUserRepository) Update(user entities.User) (entities.User, error) {
+	return entities.User{Name: user.Name, Email: user.Email, Password: user.Password}, nil
+}
+func (m falseMockUserRepository) Delete(userId int) error {
 	return nil
 }
