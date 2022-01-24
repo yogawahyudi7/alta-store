@@ -14,10 +14,10 @@ func NewCartsRepo(db *gorm.DB) *CartsRepository {
 	return &CartsRepository{db: db}
 }
 
-func (cr *CartsRepository) Gets() ([]entities.Cart, error) {
-	carts := []entities.Cart{}
-	cr.db.Find(&carts)
-	return carts, nil
+func (cr *CartsRepository) Get(cartID uint) ([]entities.Detail_cart, error) {
+	dCarts := []entities.Detail_cart{}
+	cr.db.Where("cart_id=?", cartID).Find(&dCarts)
+	return dCarts, nil
 }
 
 func (cr *CartsRepository) Insert(newCart entities.Cart) (entities.Cart, error) {
@@ -25,18 +25,18 @@ func (cr *CartsRepository) Insert(newCart entities.Cart) (entities.Cart, error) 
 	return newCart, nil
 }
 
-func (cr *CartsRepository) InsertProduct(cartID uint, newProduct entities.Detail_cart) (entities.Detail_cart, error) {
+func (cr *CartsRepository) InsertProduct(newProduct entities.Detail_cart) (entities.Detail_cart, error) {
+	temp := entities.Detail_cart{}
+	cr.db.Where("cart_id=? AND product_id=?", newProduct.CartID, newProduct.ProductID).Find(&temp)
+	if temp.ID != 0 {
+		temp.Qty += newProduct.Qty
+		temp.TotalPrice += newProduct.TotalPrice
+		cr.db.Save(&temp)
+		return temp, nil
+	}
 	cr.db.Save(&newProduct)
 	return newProduct, nil
-}
 
-func (cr *CartsRepository) UpdateProduct(cartID, productID uint, qty int) (entities.Detail_cart, error) {
-	detail_cart := entities.Detail_cart{}
-	cr.db.Where("cart_id=? AND product_id=?", cartID, productID).Find(&detail_cart)
-
-	detail_cart.Qty += qty
-	cr.db.Save(&detail_cart)
-	return detail_cart, nil
 }
 
 func (cr *CartsRepository) DeleteProduct(cartID, productID uint) (entities.Detail_cart, error) {
