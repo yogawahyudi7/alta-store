@@ -15,8 +15,12 @@ go run main.go
 
 Open endpoints require no Authentication.
 
-* Register : `POST /users/register`
-* Login : `POST /users/login/`
+- Register : `POST /users/register`
+- Login : `POST /users/login/`
+- Get products data : `GET /product`
+- Get products data by ID : `GET /produts/:id`
+- Get categories data: `GET /categorys/:id`
+- Get category data by ID : `GET /categorys/:id`
 
 ## Endpoints that require Authentication
 
@@ -34,21 +38,15 @@ Each endpoint manipulates or displays information related to the User whose Toke
 
 Each endpoint manipulates or displays information related to the Transaction whose Token is provided with the request:
 
-- Get transaction data by ID : `GET /transactions/:id`
-- Get transaction data by UserID : `GET /transactions/:id`
-- Create transaction by user ID : `POST /transactions/:id`
-- Update transaction by user ID : `PUT /transactions/:id`
-- Delete transaction data by user ID : `DELETE /transactions/:id`
+- Create transaction : `POST /transactions/live`
 
-### Detail Cart related
+### Cart related
 
 Each endpoint manipulates or displays information related to the Detail Cart whose Token is provided with the request:
 
-- Get detail cart data by cart ID : `GET /detail_cart/:id`
-- Get detail cart data by cart ID & user ID : `GET /detail_cart/:id`
-- Create detail cart: `POST /detail_cart/:id`
-- Update detail cart by cart ID & user ID : `PUT /detail_cart/:id`
-- Delete detail cart data by cart ID & user ID : `DELETE /detail_cart/:id`
+- Get cart data b: `GET /carts`
+- Put item to detail cart : `PUT /carts/additem`
+- Delete item from carts : `DELETE /carts/delitem`
 
 ## Endpoints that require Check Role isAdmin
 The endpoint below requires checking that the currently logged in user role is admin
@@ -57,9 +55,8 @@ The endpoint below requires checking that the currently logged in user role is a
 
 Each endpoint manipulates or displays information related to the Product whose Token and the role is admin that provided with the request:
 
-- Get products data : `GET pproduct`
-- Get products data by ID : `GET /produts/:id`
 - Get product stock update history data by ID : `GET /produts/stocks/:id`
+- Export All Product Data to PDF File : `GET /product/export`
 - Create products : `POST /products`
 - Create product stock update history : `POST /product/stocks/:id`
 - Update products : `PUT /products/:id`
@@ -69,8 +66,6 @@ Each endpoint manipulates or displays information related to the Product whose T
 
 Each endpoint manipulates or displays information related to the Product Category whose Token is provided with the request:
 
-- Get categories data: `GET /categorys/:id`
-- Get category data by ID : `GET /categorys/:id`
 - Create category : `POST /categorys/:id`
 - Update category : `PUT /categorys/:id`
 - Delete category data : `DELETE /categorys/:id`
