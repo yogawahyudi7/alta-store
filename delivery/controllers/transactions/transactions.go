@@ -95,6 +95,24 @@ func (trrep TransactionsController) PostProductsIntoTransactionCtrl() echo.Handl
 	}
 }
 
+func (trrep TransactionsController) Gets() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		uid := c.Get("user").(*jwt.Token)
+		claims := uid.Claims.(jwt.MapClaims)
+		cartID := int(claims["userid"].(float64))
+
+		if res, err := trrep.Repo.Gets(uint(cartID)); err != nil || len(res) == 0 {
+			return c.JSON(http.StatusInternalServerError, common.NewInternalServerErrorResponse())
+		} else {
+			return c.JSON(http.StatusOK, map[string]interface{}{
+				"code":    200,
+				"message": "Successful Operation",
+				"data":    res,
+			})
+		}
+	}
+}
+
 func (trrep TransactionsController) GetStatus() echo.HandlerFunc {
 	return func(c echo.Context) error {
 
