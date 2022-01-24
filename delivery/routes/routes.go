@@ -31,11 +31,19 @@ func RegisterUserPath(e *echo.Echo, uc controllers.UserController) {
 
 func RegisterPath(e *echo.Echo, crCtrl *carts.CartsController, tsCtrl *transactions.TransactionsController, cc *categorys.CategoryController, pc *products.ProductController) {
 
-	e.PUT("/carts/additem/:id", crCtrl.PutItemIntoDetail_CartCtrl())
-	e.DELETE("/carts/delitem/:id", crCtrl.DeleteItemFromDetail_CartCtrl())
+	// ---------------------------------------------------------------------
+	// CRUD Carts
+	// ---------------------------------------------------------------------
+	e.PUT("/carts/additem", crCtrl.PutItemIntoDetail_CartCtrl(), middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
+	e.GET("/carts", crCtrl.Gets(), middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
+	e.DELETE("/carts/delitem", crCtrl.DeleteItemFromDetail_CartCtrl(), middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
 
-	e.POST("/transactions/live/:id", tsCtrl.PostProductIntoTransactionCtrl())
-	e.POST("/transactions/cart/:id", tsCtrl.PostCartIntoTransactionCtrl())
+	// ---------------------------------------------------------------------
+	// CRUD Transactions
+	// ---------------------------------------------------------------------
+	e.POST("/transactions/live", tsCtrl.PostProductsIntoTransactionCtrl(), middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
+	e.POST("/transactions/status", tsCtrl.GetStatus())
+	// e.POST("/transactions/cart", tsCtrl.PostCartIntoTransactionCtrl(), middleware.JWT([]byte(constants.JWT_SECRET_KEY)))
 
 	e.GET("/categorys", cc.GetAllCategory)
 	e.GET("/categorys/:id", cc.GetCategoryByID)

@@ -41,6 +41,7 @@ require (
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/google/uuid v1.3.0
 	github.com/midtrans/midtrans-go v1.2.2
 	github.com/spf13/viper v1.10.1
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce

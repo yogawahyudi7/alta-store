@@ -12,6 +12,8 @@ type Transaction struct {
 	User_id               uint
 	Status                string
 	Url                   string
+	Invoice               string
+	OrderID               string
 	Detail_transaction_ID []Detail_transaction
 }
 
